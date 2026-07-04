@@ -160,7 +160,7 @@ export const DailyQueue: React.FC = () => {
                   {apt.symptomForm && (
                     <div className="text-xs mt-2 p-3 bg-surface-50/50 dark:bg-surface-950/20 rounded-lg max-w-xl">
                       <span className="font-bold text-surface-500 text-[10px] uppercase block mb-1">Chief Complaint Intakes</span>
-                      <p className="text-surface-700 dark:text-surface-300 italic truncate font-medium">
+                      <p className="text-surface-700 text-white italic truncate font-medium">
                         "{apt.symptomForm.llmChiefComplaint || apt.symptomForm.rawSymptoms}"
                       </p>
                     </div>

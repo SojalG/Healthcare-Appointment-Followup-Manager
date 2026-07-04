@@ -213,7 +213,7 @@ export const VisitNoteForm: React.FC = () => {
               
               <div>
                 <span className="text-[10px] font-bold text-surface-500 uppercase block mb-1">Patient-Reported Symptoms</span>
-                <p className="p-3 bg-surface-50 dark:bg-surface-950/20 border border-surface-200 dark:border-surface-850 rounded-lg text-surface-700 dark:text-surface-300 italic">
+                <p className="p-3 bg-surface-50 dark:bg-surface-950/20 text-white border border-surface-200 dark:border-surface-850 rounded-lg text-surface-700 dark:text-surface-300 italic">
                   "{appointment.symptomForm.rawSymptoms}"
                 </p>
               </div>
@@ -258,7 +258,7 @@ export const VisitNoteForm: React.FC = () => {
             <div className="glass-card p-6 bg-white/70 dark:bg-surface-900/50 space-y-6">
               <div>
                 <h3 className="font-bold text-lg text-primary-700 dark:text-primary-400 mb-3">Clinical Visit Notes</h3>
-                <p className="text-sm bg-surface-50 dark:bg-surface-850/50 p-4 border border-surface-200 dark:border-surface-800 rounded-xl leading-relaxed">
+                <p className="text-sm bg-surface-50 dark:bg-surface-850/50 p-4 border border-surface-200 dark:border-surface-800 rounded-xl leading-relaxed text-black">
                   {appointment.visitNote?.doctorNotes}
                 </p>
               </div>
@@ -279,11 +279,11 @@ export const VisitNoteForm: React.FC = () => {
                     {filedPrescriptions.map((med: any, index: number) => (
                       <div 
                         key={index}
-                        className="p-4 bg-white dark:bg-surface-950/20 border border-surface-250 dark:border-surface-850 rounded-xl flex items-center justify-between text-sm shadow-xs"
+                        className="p-4 bg-white text-black dark:bg-surface-950/20 border border-surface-250 dark:border-surface-850 rounded-xl flex items-center justify-between text-sm shadow-xs"
                       >
                         <div>
                           <span className="font-bold text-primary-700 dark:text-primary-400">{med.drug}</span>
-                          <span className="ml-2 px-2 py-0.5 text-xs font-bold rounded bg-surface-100 dark:bg-surface-800">{med.dosage}</span>
+                          <span className="ml-2 px-2 py-0.5 text-xs font-bold rounded bg-surface-100 ">{med.dosage}</span>
                           <p className="text-xs text-surface-500 mt-1">Schedule: {med.frequency} for {med.duration}</p>
                         </div>
                         {med.instructions && (
@@ -352,7 +352,7 @@ export const VisitNoteForm: React.FC = () => {
                           <Trash2 size={16} />
                         </button>
 
-                        <div className="grid sm:grid-cols-2 gap-3 pr-8">
+                        <div className="grid sm:grid-cols-2 gap-3 pr-8 text-black">
                           <div>
                             <label className="block text-[10px] font-bold text-surface-500 uppercase mb-1">Drug Name</label>
                             <input
@@ -404,12 +404,12 @@ export const VisitNoteForm: React.FC = () => {
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-bold text-surface-500 uppercase mb-1">Special Instructions</label>
+                          <label className="block text-black text-[10px] font-bold text-surface-500 uppercase mb-1">Special Instructions</label>
                           <input
                             type="text"
                             placeholder="e.g. Take with food, drink plenty of water"
                             {...register(`prescription.${index}.instructions` as const)}
-                            className="w-full px-3 py-1.5 text-xs border border-surface-200 dark:border-surface-800 rounded-lg bg-white focus:outline-none focus:border-primary-500"
+                            className="w-full px-3 py-1.5 text-xs border border-surface-200 dark:border-surface-800 rounded-lg bg-black focus:outline-none focus:border-primary-500"
                           />
                         </div>
                       </div>
