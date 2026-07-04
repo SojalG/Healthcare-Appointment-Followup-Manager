@@ -33,6 +33,34 @@ services:
       timeout: 5s
       retries: 5
 
+  backend:
+    build: ./backend
+    container_name: healthcare-backend
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: postgresql://healthcare:healthcare_dev@postgres:5432/healthcare_db
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build: ./backend
+    container_name: healthcare-worker
+    restart: unless-stopped
+    command: npm run start:worker
+    environment:
+      DATABASE_URL: postgresql://healthcare:healthcare_dev@postgres:5432/healthcare_db
+      REDIS_URL: redis://redis:6379
+      ANTHROPIC_API_KEY: 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
+    depends_on:
+      - postgres
+      - redis
+
 volumes:
   pgdata:
   redisdata:
