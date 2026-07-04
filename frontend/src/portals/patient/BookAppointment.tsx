@@ -17,7 +17,8 @@ type SymptomFields = z.infer<typeof symptomSchema>;
 
 interface Doctor {
   id: string;
-  user: {
+  name?: string;
+  user?: {
     name: string;
   };
   specialisation: string;
@@ -207,7 +208,7 @@ export const BookAppointment: React.FC = () => {
                   className="glass-card p-5 cursor-pointer bg-white/70 dark:bg-surface-900/50 hover:border-primary-500 hover:shadow-card-hover transition-all flex flex-col justify-between"
                 >
                   <div>
-                    <h3 className="font-bold text-lg text-surface-900 dark:text-surface-100">Dr. {doc.user.name}</h3>
+                    <h3 className="font-bold text-lg text-surface-900 dark:text-surface-100">Dr. {doc.user?.name}</h3>
                     <p className="text-xs text-primary-650 dark:text-primary-400 font-semibold uppercase tracking-wider mt-1">
                       {doc.specialisation}
                     </p>
@@ -230,7 +231,7 @@ export const BookAppointment: React.FC = () => {
           <div className="lg:col-span-1 space-y-4">
             <div className="glass-card p-5 bg-white/70 dark:bg-surface-900/50">
               <h3 className="font-bold text-base mb-3">Selected Doctor</h3>
-              <p className="font-semibold text-surface-900 dark:text-surface-100">Dr. {selectedDoctor.user.name}</p>
+              <p className="font-semibold text-surface-900 dark:text-surface-100">Dr. {selectedDoctor.user?.name}</p>
               <p className="text-xs text-primary-650 dark:text-primary-400">{selectedDoctor.specialisation}</p>
             </div>
 
@@ -243,11 +244,24 @@ export const BookAppointment: React.FC = () => {
                 min={format(addDays(new Date(), 1), 'yyyy-MM-dd')}
                 value={selectedDate}
                 onChange={(e) => {
-                  setSelectedDate(e.target.value);
+                  // FIX 1: If the input is cleared, fall back to tomorrow instead of an empty string
+                  const fallbackDate = format(addDays(new Date(), 1), 'yyyy-MM-dd');
+                  setSelectedDate(e.target.value || fallbackDate);
                   setSelectedSlot(null);
                 }}
                 className="w-full px-3 py-2 border border-surface-200 dark:border-surface-800 rounded-lg focus:outline-none focus:border-primary-500 bg-white dark:bg-surface-950/30 text-sm"
               />
+            </div>
+          </div>
+
+          {/* Slot Selection Grid */}
+          <div className="lg:col-span-2 space-y-4">
+            <div className="glass-card p-6 bg-white/70 dark:bg-surface-900/50">
+              
+              {/* FIX 2: Safely check that selectedDate exists before formatting */}
+              <h3 className="font-bold text-lg mb-4">
+                Available Slots for {selectedDate ? format(parseISO(selectedDate), 'MMMM d, yyyy') : 'Selected Date'}
+              </h3>
             </div>
           </div>
 
@@ -330,16 +344,16 @@ export const BookAppointment: React.FC = () => {
               <h3 className="font-bold text-lg mb-4">Confirm Appointment Details</h3>
               <div className="grid grid-cols-2 gap-4 p-4 bg-surface-50 dark:bg-surface-850/50 rounded-xl text-sm">
                 <div>
-                  <span className="text-xs text-surface-500 uppercase block font-semibold mb-0.5">Doctor</span>
-                  <span className="font-bold text-surface-900 dark:text-surface-100">Dr. {selectedDoctor.user.name}</span>
+                  <span className="text-xs text-surface-500 uppercase block font-semibold mb-0.5 text-black">Doctor</span>
+                  <span className="font-bold text-surface-900 text-black">Dr. {selectedDoctor.user?.name}</span>
                 </div>
                 <div>
-                  <span className="text-xs text-surface-500 uppercase block font-semibold mb-0.5">Specialization</span>
-                  <span className="font-medium text-surface-700 dark:text-surface-300">{selectedDoctor.specialisation}</span>
+                  <span className="text-xs text-surface-500 uppercase block font-semibold mb-0.5 text-black">Specialization</span>
+                  <span className="font-medium text-surface-700 text-black">{selectedDoctor.specialisation}</span>
                 </div>
                 <div className="col-span-2">
-                  <span className="text-xs text-surface-500 uppercase block font-semibold mb-0.5">Time Slot</span>
-                  <span className="font-medium text-surface-750">
+                  <span className="text-xs text-surface-500 uppercase block font-semibold mb-0.5 text-black">Time Slot</span>
+                  <span className="font-medium text-surface-750 text-black">
                     {format(parseISO(selectedSlot.start), 'EEEE, MMMM d, yyyy')} @ {format(parseISO(selectedSlot.start), 'h:mm a')}
                   </span>
                 </div>

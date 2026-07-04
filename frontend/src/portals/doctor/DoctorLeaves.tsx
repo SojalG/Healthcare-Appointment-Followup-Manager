@@ -23,10 +23,6 @@ export const DoctorLeaves: React.FC = () => {
     resolver: zodResolver(leaveSchema)
   });
 
-  // Fetch doctor profile (to list leaves - we will fetch from /appointments/mine or general info, wait, we can fetch all doctors or get the current doctor's leaves.
-  // Actually, wait! Does the backend list me/leaves? No.
-  // But wait, the listDoctors endpoint returns all doctors and their leaves! So we can find the logged-in doctor's profile in the doctors list!
-  // This is super simple and avoids adding new endpoints.)
   const { data: doctorsResponse, isLoading } = useQuery({
     queryKey: ['admin-doctors'], // Reuse list doctors query
     queryFn: async () => {
@@ -124,7 +120,7 @@ export const DoctorLeaves: React.FC = () => {
                 type="date"
                 min={format(addDays(new Date(), 1), 'yyyy-MM-dd')}
                 {...register('date')}
-                className="w-full px-3 py-2 border border-surface-200 dark:border-surface-800 rounded-lg focus:outline-none focus:border-primary-500 bg-white text-sm"
+                className="w-full px-3 py-2 border border-surface-200 dark:border-surface-800 rounded-lg focus:outline-none focus:border-primary-500 bg-black text-sm"
               />
               {errors.date && <p className="text-xs text-red-500 mt-1">{errors.date.message}</p>}
             </div>
@@ -135,7 +131,7 @@ export const DoctorLeaves: React.FC = () => {
                 placeholder="e.g. Annual leave, Medical conference"
                 rows={3}
                 {...register('reason')}
-                className="w-full px-3 py-2 border border-surface-200 dark:border-surface-800 rounded-lg focus:outline-none focus:border-primary-500 bg-white text-sm"
+                className="w-full px-3 py-2 border border-surface-200 dark:border-surface-800 rounded-lg focus:outline-none focus:border-primary-500 bg-black text-sm"
               />
             </div>
 

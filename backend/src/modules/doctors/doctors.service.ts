@@ -173,27 +173,25 @@ export async function deleteDoctor(doctorProfileId: string) {
 }
 
 export async function searchDoctors(specialisation?: string) {
-  return prisma.user.findMany({
+  // FIX: Search the DoctorProfile table instead of the User table
+  return prisma.doctorProfile.findMany({
     where: {
-      role: Role.DOCTOR,
       ...(specialisation && {
-        doctorProfile: {
-          specialisation: {
-            contains: specialisation,
-            mode: 'insensitive' as const,
-          },
+        specialisation: {
+          contains: specialisation,
+          mode: 'insensitive' as const,
         },
       }),
     },
     select: {
-      id: true,
-      name: true,
-      email: true,
-      doctorProfile: {
+      id: true, // This is now correctly the DoctorProfile ID!
+      specialisation: true,
+      slotDurationMin: true,
+      user: {
         select: {
           id: true,
-          specialisation: true,
-          slotDurationMin: true,
+          name: true,
+          email: true,
         },
       },
     },

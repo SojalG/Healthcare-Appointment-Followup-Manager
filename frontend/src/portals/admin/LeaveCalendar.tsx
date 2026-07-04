@@ -6,13 +6,15 @@ import { format, parseISO } from 'date-fns';
 
 interface Doctor {
   id: string;
-  specialisation: string;
-  user: {
+  name?: string;
+  specialisation?: string;
+  user?: {
     name: string;
     email: string;
   };
-  doctorProfile: {
-    leaves: {
+  doctorProfile?: {
+    specialisation?: string;
+    leaves?: {
       date: string;
       reason?: string;
     }[];
@@ -34,11 +36,15 @@ export const LeaveCalendar: React.FC = () => {
   // Flatten leaves list to sort and display chronologically
   const allLeaves: { doctorName: string; specialisation: string; date: string; reason?: string }[] = [];
   doctors.forEach(doc => {
+    // Safely extract leaves
     const leaves = doc.doctorProfile?.leaves || [];
+    
     leaves.forEach(l => {
       allLeaves.push({
-        doctorName: doc.user.name,
-        specialisation: doc.specialisation,
+        // Safely extract name depending on how the backend structured it
+        doctorName: doc.name || doc.user?.name || 'Unknown',
+        // Safely extract specialisation
+        specialisation: doc.doctorProfile?.specialisation || doc.specialisation || 'General',
         date: l.date,
         reason: l.reason
       });

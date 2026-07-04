@@ -62,12 +62,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
           }
+        } finally {
+          // FIX: Only set loading to false AFTER the API call finishes (success or fail)
+          setLoading(false); 
         }
       })();
+    } else {
+      // FIX: Also set loading to false if there is no token at all
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
+  
   const login = async (email: string, password: string) => {
     const { data } = await apiClient.post('/auth/login', { email, password });
     const { accessToken, refreshToken, user: userFromServer } = data.data;

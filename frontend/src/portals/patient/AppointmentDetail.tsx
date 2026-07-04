@@ -181,7 +181,7 @@ export const AppointmentDetail: React.FC = () => {
                   <FileText size={18} />
                   Symptom Information
                 </h3>
-                <p className="text-sm text-surface-800 mt-3 p-4 bg-surface-50 dark:bg-surface-850/50 rounded-xl border border-surface-200 dark:border-surface-800">
+                <p className="text-sm text-surface-800 mt-3 p-4 bg-surface-50 dark:bg-surface-850/50 rounded-xl border border-surface-200 dark:border-surface-800 bg-black">
                   {appointment.symptomForm.rawSymptoms}
                 </p>
               </div>
