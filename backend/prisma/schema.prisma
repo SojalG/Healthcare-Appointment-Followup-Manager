@@ -1,0 +1,246 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// Phase 1: Auth & Roles
+// ============================================================
+
+enum Role {
+  PATIENT
+  DOCTOR
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         Role
+  name         String
+  phone        String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations (added in later phases)
+  doctorProfile   DoctorProfile?
+  appointments    Appointment[]   @relation("PatientAppointments")
+  googleAuth      GoogleAuth?
+
+  @@map("users")
+}
+
+// ============================================================
+// Phase 2: Doctor & Slot Management
+// ============================================================
+
+model DoctorProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique @map("user_id")
+  specialisation  String
+  slotDurationMin Int      @default(30) @map("slot_duration_min")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workingHours WorkingHours[]
+  leaves       Leave[]
+  appointments Appointment[]  @relation("DoctorAppointments")
+
+  @@map("doctor_profiles")
+}
+
+model WorkingHours {
+  id        String @id @default(uuid())
+  doctorId  String @map("doctor_id")
+  weekday   Int    // 0 = Sunday, 6 = Saturday
+  startTime String @map("start_time") // "09:00"
+  endTime   String @map("end_time")   // "17:00"
+
+  doctor DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@unique([doctorId, weekday])
+  @@map("working_hours")
+}
+
+model Leave {
+  id        String   @id @default(uuid())
+  doctorId  String   @map("doctor_id")
+  date      DateTime @db.Date
+  reason    String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  doctor DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@unique([doctorId, date])
+  @@map("leaves")
+}
+
+// ============================================================
+// Phase 3: Appointments
+// ============================================================
+
+enum AppointmentStatus {
+  PENDING_HOLD
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model Appointment {
+  id                    String            @id @default(uuid())
+  patientId             String            @map("patient_id")
+  doctorId              String            @map("doctor_id")
+  slotStart             DateTime          @map("slot_start")
+  slotEnd               DateTime          @map("slot_end")
+  status                AppointmentStatus @default(PENDING_HOLD)
+  holdExpiresAt         DateTime?         @map("hold_expires_at")
+  googleEventIdPatient  String?           @map("google_event_id_patient")
+  googleEventIdDoctor   String?           @map("google_event_id_doctor")
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+
+  patient     User          @relation("PatientAppointments", fields: [patientId], references: [id])
+  doctor      DoctorProfile @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  symptomForm SymptomForm?
+  visitNote   VisitNote?
+  notificationLogs NotificationLog[]
+
+  // Partial unique index added via raw migration (see §5)
+  // CREATE UNIQUE INDEX uniq_doctor_slot_active ON appointments (doctor_id, slot_start)
+  // WHERE status IN ('PENDING_HOLD', 'CONFIRMED');
+
+  @@map("appointments")
+}
+
+// ============================================================
+// Phase 4: Symptom Form
+// ============================================================
+
+enum LlmStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+model SymptomForm {
+  id                String    @id @default(uuid())
+  appointmentId     String    @unique @map("appointment_id")
+  rawSymptoms       String    @map("raw_symptoms") @db.Text
+  llmUrgency        String?   @map("llm_urgency")
+  llmChiefComplaint String?   @map("llm_chief_complaint")
+  llmQuestions      Json?     @map("llm_questions") // string[]
+  llmRawResponse    String?   @map("llm_raw_response") @db.Text
+  llmStatus         LlmStatus @default(PENDING) @map("llm_status")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@map("symptom_forms")
+}
+
+// ============================================================
+// Phase 5: Visit Notes
+// ============================================================
+
+model VisitNote {
+  id                String    @id @default(uuid())
+  appointmentId     String    @unique @map("appointment_id")
+  doctorNotes       String    @map("doctor_notes") @db.Text
+  prescription      Json?     // [{drug, dosage, frequency, duration, instructions}]
+  llmPatientSummary String?   @map("llm_patient_summary") @db.Text
+  llmRawResponse    String?   @map("llm_raw_response") @db.Text
+  llmStatus         LlmStatus @default(PENDING) @map("llm_status")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  appointment    Appointment     @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  medicationJobs MedicationJob[]
+
+  @@map("visit_notes")
+}
+
+// ============================================================
+// Phase 6: Notifications & Calendar
+// ============================================================
+
+enum NotificationType {
+  CONFIRMATION
+  REMINDER_24H
+  REMINDER_1H
+  CANCELLATION
+  LEAVE_NOTICE
+  MEDICATION_REMINDER
+}
+
+enum NotificationChannel {
+  EMAIL
+  CALENDAR
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model NotificationLog {
+  id            String             @id @default(uuid())
+  type          NotificationType
+  channel       NotificationChannel
+  recipientId   String             @map("recipient_id")
+  appointmentId String?            @map("appointment_id")
+  status        NotificationStatus @default(PENDING)
+  attempts      Int                @default(0)
+  lastError     String?            @map("last_error") @db.Text
+  idempotencyKey String?           @unique @map("idempotency_key")
+  createdAt     DateTime           @default(now()) @map("created_at")
+  sentAt        DateTime?          @map("sent_at")
+
+  appointment   Appointment?       @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@map("notification_logs")
+}
+
+model GoogleAuth {
+  id              String   @id @default(uuid())
+  userId          String   @unique @map("user_id")
+  accessTokenEnc  String   @map("access_token_enc") @db.Text
+  refreshTokenEnc String   @map("refresh_token_enc") @db.Text
+  expiresAt       DateTime @map("expires_at")
+  scope           String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("google_auth")
+}
+
+// ============================================================
+// Phase 8: Medication Reminders
+// ============================================================
+
+enum MedicationJobStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model MedicationJob {
+  id          String              @id @default(uuid())
+  visitNoteId String              @map("visit_note_id")
+  drugName    String              @map("drug_name")
+  dosage      String
+  scheduledAt DateTime            @map("scheduled_at")
+  status      MedicationJobStatus @default(PENDING)
+  createdAt   DateTime            @default(now()) @map("created_at")
+
+  visitNote VisitNote @relation(fields: [visitNoteId], references: [id], onDelete: Cascade)
+
+  @@index([scheduledAt, status])
+  @@map("medication_jobs")
+}

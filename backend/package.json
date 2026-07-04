@@ -1,0 +1,49 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "start:worker": "tsx src/worker.ts",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:generate": "prisma generate",
+    "db:seed": "tsx src/db/seed.ts",
+    "db:studio": "prisma studio",
+    "test": "tsx src/tests/run-all.ts",
+    "test:auth": "tsx src/tests/phase1-auth.test.ts",
+    "test:booking": "tsx src/tests/phase3-booking.test.ts",
+    "test:symptoms": "tsx src/tests/phase4-symptoms.test.ts",
+    "test:leave": "tsx src/tests/phase7-leave.test.ts",
+    "test:meds": "tsx src/tests/phase8-meds.test.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@prisma/client": "^6.9.0",
+    "bcrypt": "^5.1.1",
+    "bullmq": "^5.34.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "googleapis": "^148.0.0",
+    "helmet": "^8.1.0",
+    "ioredis": "^5.6.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "nodemailer": "^7.0.3",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.10.0",
+    "@types/nodemailer": "^6.4.17",
+    "prisma": "^6.9.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

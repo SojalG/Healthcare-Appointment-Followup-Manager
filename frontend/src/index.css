@@ -1,0 +1,214 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Healthcare Platform — Design System (TailwindCSS v4)
+   ============================================================ */
+
+@theme {
+  /* --- Colors --- */
+  --color-primary-50: oklch(0.97 0.01 180);
+  --color-primary-100: oklch(0.93 0.03 180);
+  --color-primary-200: oklch(0.86 0.06 180);
+  --color-primary-300: oklch(0.76 0.10 180);
+  --color-primary-400: oklch(0.65 0.13 175);
+  --color-primary-500: oklch(0.55 0.14 175);
+  --color-primary-600: oklch(0.47 0.13 175);
+  --color-primary-700: oklch(0.40 0.11 175);
+  --color-primary-800: oklch(0.34 0.09 175);
+  --color-primary-900: oklch(0.28 0.07 175);
+
+  --color-accent-400: oklch(0.82 0.15 85);
+  --color-accent-500: oklch(0.75 0.17 85);
+  --color-accent-600: oklch(0.65 0.16 85);
+
+  --color-urgency-low: oklch(0.72 0.17 150);
+  --color-urgency-medium: oklch(0.75 0.17 85);
+  --color-urgency-high: oklch(0.63 0.20 25);
+
+  --color-surface-50: oklch(0.985 0 0);
+  --color-surface-100: oklch(0.97 0.003 260);
+  --color-surface-200: oklch(0.93 0.005 260);
+  --color-surface-700: oklch(0.37 0.01 260);
+  --color-surface-800: oklch(0.27 0.01 260);
+  --color-surface-900: oklch(0.20 0.01 260);
+  --color-surface-950: oklch(0.14 0.01 260);
+
+  /* --- Typography --- */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  /* --- Shadows --- */
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+  --shadow-card-hover: 0 4px 12px 0 rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  --shadow-modal: 0 20px 60px -12px rgb(0 0 0 / 0.25);
+
+  /* --- Border Radius --- */
+  --radius-card: 0.75rem;
+  --radius-btn: 0.5rem;
+  --radius-badge: 9999px;
+
+  /* --- Transitions --- */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* --- Base Styles --- */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-surface-50 text-surface-800;
+    min-height: 100dvh;
+  }
+
+  /* Dark mode */
+  @media (prefers-color-scheme: dark) {
+    body {
+      @apply bg-surface-950 text-surface-100;
+    }
+  }
+}
+
+/* --- Component Utilities --- */
+@layer components {
+  .glass-card {
+    @apply rounded-[var(--radius-card)] border border-white/20 shadow-[var(--shadow-card)];
+    background: oklch(1 0 0 / 0.7);
+    backdrop-filter: blur(12px);
+    transition: box-shadow 0.2s ease, transform 0.2s var(--ease-spring);
+  }
+
+  .glass-card:hover {
+    @apply shadow-[var(--shadow-card-hover)];
+    transform: translateY(-1px);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .glass-card {
+      background: oklch(0.2 0.01 260 / 0.6);
+      border-color: oklch(1 0 0 / 0.08);
+    }
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 
+           bg-primary-600 text-white font-medium rounded-[var(--radius-btn)]
+           transition-all duration-200;
+  }
+
+  .btn-primary:hover {
+    @apply bg-primary-700;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px oklch(0.47 0.13 175 / 0.3);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .btn-primary:disabled {
+    @apply opacity-50 cursor-not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5
+           bg-surface-100 text-surface-700 font-medium rounded-[var(--radius-btn)]
+           border border-surface-200 transition-all duration-200;
+  }
+
+  .btn-secondary:hover {
+    @apply bg-surface-200 text-surface-800;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5
+           bg-urgency-high text-white font-medium rounded-[var(--radius-btn)]
+           transition-all duration-200;
+  }
+
+  .btn-danger:hover {
+    filter: brightness(0.9);
+    transform: translateY(-1px);
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2.5 rounded-[var(--radius-btn)] border border-surface-200
+           bg-white text-surface-800 placeholder:text-surface-700/50
+           transition-all duration-200;
+  }
+
+  .input-field:focus {
+    @apply outline-none border-primary-400 ring-2 ring-primary-400/20;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .input-field {
+      @apply bg-surface-900 border-surface-700 text-surface-100;
+    }
+  }
+
+  .badge,
+  .badge-low,
+  .badge-medium,
+  .badge-high {
+    @apply inline-flex items-center px-2.5 py-0.5 text-xs font-semibold
+           rounded-[var(--radius-badge)];
+  }
+
+  .badge-low {
+    background: oklch(0.72 0.17 150 / 0.15);
+    color: oklch(0.45 0.15 150);
+  }
+
+  .badge-medium {
+    background: oklch(0.75 0.17 85 / 0.15);
+    color: oklch(0.50 0.15 85);
+  }
+
+  .badge-high {
+    background: oklch(0.63 0.20 25 / 0.15);
+    color: oklch(0.45 0.18 25);
+  }
+
+  .skeleton {
+    @apply rounded-md bg-surface-200 animate-pulse;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .skeleton {
+      @apply bg-surface-800;
+    }
+  }
+}
+
+/* --- Animations --- */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out both;
+}
+
+.animate-slide-in {
+  animation: slide-in-right 0.3s ease-out both;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s var(--ease-spring) both;
+}
